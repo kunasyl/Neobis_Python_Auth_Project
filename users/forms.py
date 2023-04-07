@@ -1,7 +1,7 @@
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 
@@ -22,3 +22,19 @@ class RegisterUserForm(UserCreationForm):
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.TextInput(attrs={'class': 'form-input'}))
+
+class SetPasswordForm(SetPasswordForm):
+    class Meta:
+        model = User
+        fields = ('new_password1', 'new_password2')
+
+    def save(self, commit=True):
+        password = self.cleaned_data["new_password1"]
+        self.user.set_password(password)
+        if commit:
+            self.user.save()
+        return self.user
+
+class PasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
