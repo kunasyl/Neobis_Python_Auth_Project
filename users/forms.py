@@ -23,18 +23,13 @@ class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.TextInput(attrs={'class': 'form-input'}))
 
+# Форма для смены пароля
 class SetPasswordForm(SetPasswordForm):
     class Meta:
         model = User
         fields = ('new_password1', 'new_password2')
 
-    def save(self, commit=True):
-        password = self.cleaned_data["new_password1"]
-        self.user.set_password(password)
-        if commit:
-            self.user.save()
-        return self.user
-
+# Форма - запрос для смены пароля - ввод почты
 class PasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
         super(PasswordResetForm, self).__init__(*args, **kwargs)

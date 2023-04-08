@@ -10,6 +10,7 @@ from users.tokens import account_activation_token
 
 
 class RegistrationServices():
+    # Отправка ссылки для активации аккаунта на почту
     def activateEmail(self, request, user, to_email):
         mail_subject = "Активация аккаунта"
         message = render_to_string("users/email_templates/activate_account.html", {
@@ -22,6 +23,7 @@ class RegistrationServices():
         email = EmailMessage(mail_subject, message, to=[to_email])
         return email.send()
 
+    # Отправка ссылки на смену пароля на почту
     def resetPassword(self, request, user_email):
         associated_user = get_user_model().objects.filter(Q(email=user_email)).first()
         if associated_user:

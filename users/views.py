@@ -23,6 +23,7 @@ def index(request):
 def index_id(request, id):
     return HttpResponse(id)
 
+# Активация аккаунта
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
@@ -32,7 +33,7 @@ def activate(request, uidb64, token):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
-        user.is_active = True
+        user.is_active = True   # активировать пользователя
         user.save()
 
         messages.success(request, "Почта успешно подтверждена")
@@ -50,13 +51,13 @@ def pageNotFound(request, exception):
 @user_not_authenticated
 def register(request):
     if request.method == "POST":
-        form = RegisterUserForm(request.POST)
+        form = RegisterUserForm(request.POST)   # форма регистрации
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active=False
             user.save()
             user_email = form.cleaned_data.get('email')
-            email_sent = services.activateEmail(request, user, user_email)
+            email_sent = services.activateEmail(request, user, user_email)   # отправка почты
             if email_sent:
                 messages.success(request, f'На {user_email} была выслана ссылка на активацию \
                                             Пожалуйста активируйте аккаунт.')
@@ -82,10 +83,10 @@ def register(request):
 @user_not_authenticated
 def password_reset_request(request):
     if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
+        form = PasswordResetForm(request.POST)   # форма - забыл пароль - пользователь вводит почту
         if form.is_valid():
             user_email = form.cleaned_data['email']
-            email_sent = services.resetPassword(request, user_email)
+            email_sent = services.resetPassword(request, user_email)   # отправка почты
 
             if email_sent:
                 messages.success(request,
@@ -110,7 +111,7 @@ def password_reset_request(request):
 def password_change(request):
     user = request.user
     if request.method == 'POST':
-        form = SetPasswordForm(user, request.POST)
+        form = SetPasswordForm(user, request.POST)   # форма на смену пароля
         if form.is_valid():
             form.save()
             messages.success(request, "Пароль успешно изменен")
@@ -122,6 +123,7 @@ def password_change(request):
     form = SetPasswordForm(user)
     return render(request, 'users/password_reset_confirm.html', {'form': form})
 
+# Пользователь переходит по данной ссылке для смены пароля
 def passwordResetConfirm(request, uidb64, token):
     User = get_user_model()
     try:
@@ -132,11 +134,11 @@ def passwordResetConfirm(request, uidb64, token):
 
     if user is not None and account_activation_token.check_token(user, token):
         if request.method == 'POST':
-            form = SetPasswordForm(user, request.POST)
+            form = SetPasswordForm(user, request.POST)   # форма на смену пароля
             if form.is_valid():
                 form.save()
                 messages.success(request, "Пароль был успешно изменен.")
-                return redirect('home')
+                return redirect('login')
             else:
                 for error in list(form.errors.values()):
                     messages.error(request, error)
@@ -149,6 +151,7 @@ def passwordResetConfirm(request, uidb64, token):
     messages.error(request, 'Что-то пошло не так.')
     return redirect("home")
 
+# Вход
 class LoginUser(LoginView):
     form_class = LoginUserForm
     template_name = 'users/login.html'
