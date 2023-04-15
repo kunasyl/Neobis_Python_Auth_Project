@@ -3,6 +3,7 @@ decouple==0.0.7
 Django==4.1.7
 django-crispy-forms==2.0
 fontawesomefree==6.4.0
+python-decouple==3.8
 six==1.16.0
 sqlparse==0.4.3
 tzdata==2023.3
